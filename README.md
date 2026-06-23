@@ -1,2 +1,2 @@
 # MDRepo
-This Repo holds documents
+This repository holds Markdown files.
