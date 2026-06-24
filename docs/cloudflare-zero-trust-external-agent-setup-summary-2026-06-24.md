@@ -56,6 +56,16 @@ Interpretation:
 - ✅ Cloudflare Access authentication is functioning.
 - ❌ Backend route at that path is not yet implemented (or path mismatch).
 
+### 6) Route alignment update (critical)
+After verifying backend behavior, the Cloudflare Access path should match the existing backend route.
+
+- **Existing backend route to use:** `/v1/rag/query`
+- **Do not use (for now):** `/v1/agent/rag/query`
+
+Updated public endpoint to protect/call:
+
+- `https://rag-api.pawlukwebstudio.com/v1/rag/query`
+
 ---
 
 ## 📌 Current status
@@ -66,9 +76,8 @@ Interpretation:
 - Endpoint is reachable through Cloudflare with token-based auth.
 
 ### Still required
-- Implement backend API route:
-  - `POST /v1/agent/rag/query`
-- Or adjust destination/path to match the real backend route.
+- Ensure Cloudflare application path is updated to `/v1/rag/query`.
+- Confirm backend route `POST /v1/rag/query` is active and returns expected response.
 - Ensure tunnel forwards this hostname/path to the correct local service/port.
 
 ---
@@ -85,7 +94,7 @@ External clients must send these headers on each request:
 ## 🌐 Endpoint to share with external AI agents
 
 - **Method:** `POST`
-- **URL:** `https://rag-api.pawlukwebstudio.com/v1/agent/rag/query`
+- **URL:** `https://rag-api.pawlukwebstudio.com/v1/rag/query`
 - **Auth:** Cloudflare Service Token headers (above)
 - **Body:** JSON (as defined by your backend API contract)
 
@@ -94,7 +103,7 @@ External clients must send these headers on each request:
 ## 🧪 Test command template
 
 ```bash
-curl -X POST "https://rag-api.pawlukwebstudio.com/v1/agent/rag/query" \
+curl -X POST "https://rag-api.pawlukwebstudio.com/v1/rag/query" \
   -H "Content-Type: application/json" \
   -H "CF-Access-Client-Id: <CLIENT_ID>" \
   -H "CF-Access-Client-Secret: <CLIENT_SECRET>" \
@@ -105,7 +114,7 @@ curl -X POST "https://rag-api.pawlukwebstudio.com/v1/agent/rag/query" \
 
 ## Next session recommended tasks
 
-1. Implement FastAPI route `POST /v1/agent/rag/query` (or align path).
+1. Verify Cloudflare application destination path is `/v1/rag/query`.
 2. Validate locally first (`localhost`) and then through Cloudflare URL.
 3. Publish a one-page integration spec:
    - Request schema
@@ -119,4 +128,4 @@ curl -X POST "https://rag-api.pawlukwebstudio.com/v1/agent/rag/query" \
 ## Outcome statement
 
 Today’s objective of setting up **Cloudflare Zero Trust external access control** was completed successfully.  
-The remaining work is backend endpoint implementation/verification so external AI agents can receive successful API responses.
+The remaining work is final route alignment/verification so external AI agents can receive successful API responses.
