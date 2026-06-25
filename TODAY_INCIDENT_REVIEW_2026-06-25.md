@@ -86,69 +86,27 @@ Rate limiting itself was validated successfully once traffic path was clean.
 
 ---
 
-## NEXT ACTIONS (includes required code + JSON contract)
+## NEXT ACTIONS (updated endpoint contract)
 
-1. **Implement and publish `POST /v1/agent/rag/query` in `main.py`**
+1. **Implement and publish `POST /v1/agent/rag/query` in `main.py` with the SAME behavior as `/v1/rag/query` (no stub contract):**
 
 ```python
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-
-app = FastAPI()
-
-class RagQueryRequest(BaseModel):
-    query: str = Field(..., min_length=1, description="User query text")
-
-class RagQueryResponse(BaseModel):
-    ok: bool
-    query: str
-    answer: str
-
-@app.post("/v1/agent/rag/query", response_model=RagQueryResponse)
-async def rag_query(payload: RagQueryRequest):
-    q = payload.query.strip()
-    if not q:
-        raise HTTPException(status_code=400, detail="Query cannot be empty")
-
-    # Stub response for rate-limit validation phase
-    return RagQueryResponse(
-        ok=True,
-        query=q,
-        answer=f"Stub response for query: {q}"
-    )
+@app.post("/v1/agent/rag/query")
+def agent_rag_query(chat_request: ChatRequest):
+    result = rag_endpoint(chat_request)
+    return {
+        "answer": result["response"],
+        "sources": result.get("retrieved_documents", []),
+        "timing": result.get("timing", {}),
+        "session_id": chat_request.session_id,
+    }
 ```
 
-2. **Adopt JSON contract requirement (current validation phase)**
-
-```json
-{
-  "endpoint": "POST /v1/agent/rag/query",
-  "request": {
-    "contentType": "application/json",
-    "body": {
-      "query": "string (required, non-empty)"
-    }
-  },
-  "successResponse": {
-    "status": 200,
-    "body": {
-      "ok": true,
-      "query": "string",
-      "answer": "string"
-    }
-  },
-  "validationErrorResponse": {
-    "status": 400,
-    "body": {
-      "detail": "Query cannot be empty"
-    }
-  },
-  "notes": [
-    "No provider/API keys required for current rate-limit validation phase.",
-    "Stubbed answer is acceptable until full RAG integration is enabled."
-  ]
-}
-```
+2. **Keep response contract aligned with existing public endpoint `/v1/rag/query`:**
+   - `answer`
+   - `sources`
+   - `timing`
+   - `session_id`
 
 3. **Deploy backend revision** so production serves this route.
 4. **Smoke test** immediately after deploy:
@@ -169,7 +127,7 @@ curl -i -X POST "https://rag-api.pawlukwebstudio.com/v1/agent/rag/query" \
 
 ## Success Criteria (Definition of Done)
 
-- `POST /v1/agent/rag/query` returns app response (expected `200` for stub).
+- `POST /v1/agent/rag/query` returns the real app response contract (`answer`, `sources`, `timing`, `session_id`).
 - No Cloudflare Access redirect (`302`) on endpoint.
 - Burst test triggers rate-limit (`429`) predictably.
 - Cooldown returns to baseline behavior.
