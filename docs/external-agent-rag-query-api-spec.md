@@ -55,7 +55,7 @@ Cloudflare remains the source of truth for edge rate limiting and HTTP traffic p
   - Recommended: provide a stable agent/session identifier for traceability
 
 ### Notes
-- Unknown fields are ignored by current endpoint behavior unless upstream validators reject malformed payloads.
+- Unknown fields may be ignored or rejected depending on request model configuration.
 - An empty or missing `messages` array is treated as invalid request input.
 
 ## Success Response Schema
@@ -89,10 +89,9 @@ Cloudflare remains the source of truth for edge rate limiting and HTTP traffic p
 
 | HTTP status | Error type | When it occurs | Example shape |
 |---|---|---|---|
-| 400 | Invalid request | Business-level validation failure in endpoint logic (for example, empty query/messages path) | `{ "detail": { "error": "invalid_request", "message": "..." } }` |
+| 422 | Validation error | Request body fails FastAPI/Pydantic schema validation (observed in smoke test) | `{ "detail": [ { "loc": ["body", "messages"], "msg": "field required", "type": "value_error.missing" } ] }` |
+| 400 | Invalid request | Business-level validation failure in endpoint logic (if implemented) | `{ "detail": { "error": "invalid_request", "message": "..." } }` |
 | 401/403 | Unauthorized/Forbidden | Authentication or policy rejection when enabled by edge or upstream controls | `{ "detail": { "error": "forbidden", "message": "..." } }` |
-| 404 | Not found / no documents | Route not deployed, or RAG store has no indexed documents | `{ "detail": { "error": "no_documents", "message": "..." } }` |
-| 422 | Validation error | Request body fails FastAPI/Pydantic schema validation | `{ "detail": [ { "loc": ["body", "messages"], "msg": "field required", "type": "value_error.missing" } ] }` |
 | 429 | Rate limit exceeded | Burst traffic exceeds edge/app throttling limits | `{ "detail": "Too Many Requests" }` or policy-defined equivalent |
 | 500/502/503/504 | Upstream/runtime failure | LLM provider unavailable, timeout, or internal processing error | `{ "detail": { "error": "...", "message": "..." } }` |
 
