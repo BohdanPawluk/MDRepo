@@ -45,6 +45,9 @@ with behavior aligned to existing `/v1/rag/query` response semantics, while enfo
    - `timing`
    - `session_id`
 
+7. **Edge traffic and policy authority**
+   - Cloudflare remains the source of truth for edge rate limiting and HTTP traffic policy for this endpoint.
+
 ---
 
 ## 3) Technical Target
@@ -266,3 +269,4 @@ Start with Phase 0 discovery and show findings before any edits.
 ## 9) Change Log
 
 - v1.0 (2026-06-26): Initial phased implementation plan with mandatory backup, manual runtime control, stop/confirm gates, and publish-spec deliverable.
+- v1.1 (2026-06-26): Added Cloudflare authority statement for edge traffic and rate-limiting policy.
