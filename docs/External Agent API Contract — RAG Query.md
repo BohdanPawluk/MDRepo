@@ -9,7 +9,7 @@
 ## Authentication
 Use one of:
 - `Authorization: Bearer <agent_token>`
-- Cloudflare Access service token headers (if configured)
+
 
 Requests without valid auth are rejected (`401` or `403`).
 
