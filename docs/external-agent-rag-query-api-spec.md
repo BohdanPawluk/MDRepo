@@ -21,7 +21,7 @@
 - `Authorization: Bearer <token>`
 - `Accept: application/json`
 
-Cloudflare remains the source of truth for edge rate limiting and HTTP traffic policy for this endpoint.
+
 
 ## Request Schema
 
